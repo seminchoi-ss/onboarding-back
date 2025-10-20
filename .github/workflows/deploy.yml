@@ -30,6 +30,7 @@ jobs:
       - name: Build AMI with Packer
         id: packer
         run: |
+          set -o pipefail
           # Get the 7-character short Git commit hash
           GIT_HASH=$(echo "${{ github.sha }}" | cut -c1-7)
           echo "Using Git hash: $GIT_HASH"

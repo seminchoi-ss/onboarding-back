@@ -28,6 +28,7 @@ source "amazon-ebs" "app-tier" {
     }
     most_recent = true
     owners      = ["self"]
+    ssh_username  = "ubuntu"
   }
   ami_name = "csm-app-tier-${var.git_hash}"
   tags = {
