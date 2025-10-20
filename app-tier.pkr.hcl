@@ -57,7 +57,7 @@ build {
   // Node.js, npm, pm2는 기반 AMI에 이미 설치되어 있다고 가정합니다.
 
   provisioner "file" {
-    source      = "."
+    source      = "./"
     destination = "/tmp/app-source"
   }
 
