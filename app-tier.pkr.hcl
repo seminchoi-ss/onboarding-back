@@ -20,6 +20,7 @@ variable "git_hash" {
 source "amazon-ebs" "app-tier" {
   region        = var.aws_region
   instance_type = "t3.small"
+  ssh_username  = "ubuntu"
   source_ami_filter {
     filters = {
       "tag:Name"          = "csm-app-tier-ami"
@@ -28,7 +29,6 @@ source "amazon-ebs" "app-tier" {
     }
     most_recent = true
     owners      = ["self"]
-    ssh_username  = "ubuntu"
   }
   ami_name = "csm-app-tier-${var.git_hash}"
   tags = {
