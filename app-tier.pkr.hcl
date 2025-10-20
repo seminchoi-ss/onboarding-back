@@ -17,10 +17,22 @@ variable "git_hash" {
   default = "local"
 }
 
+variable "vpc_id" {
+  type    = string
+  default = "" # GitHub Secrets에서 값을 받지 못할 경우를 대비한 기본값
+}
+
+variable "subnet_id" {
+  type    = string
+  default = "" # GitHub Secrets에서 값을 받지 못할 경우를 대비한 기본값
+}
+
 source "amazon-ebs" "app-tier" {
   region        = var.aws_region
   instance_type = "t3.small"
   ssh_username  = "ubuntu"
+  vpc_id        = var.vpc_id
+  subnet_id     = var.subnet_id
   source_ami_filter {
     filters = {
       "tag:Name"          = "csm-app-tier-ami"

@@ -36,7 +36,7 @@ jobs:
           echo "Using Git hash: $GIT_HASH"
 
           packer init app-tier.pkr.hcl
-          packer build -var "aws_region=ap-northeast-2" -var "git_hash=$GIT_HASH" -machine-readable app-tier.pkr.hcl | tee packer.log
+          packer build -var "aws_region=${{ secrets.AWS_REGION }}" -var "git_hash=$GIT_HASH" -var "vpc_id=${{ secrets.AWS_VPC_ID }}" -var "subnet_id=${{ secrets.AWS_SUBNET_ID }}" -machine-readable app-tier.pkr.hcl | tee packer.log
           echo "ami_id=$(grep -E 'artifact,0,id' packer.log | cut -d, -f6 | cut -d: -f2)" >> $GITHUB_OUTPUT
 
       # - name: Set AMI ID environment variable
