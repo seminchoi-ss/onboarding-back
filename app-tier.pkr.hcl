@@ -33,6 +33,7 @@ source "amazon-ebs" "app-tier" {
   ssh_username  = "ubuntu"
   vpc_id        = var.vpc_id
   subnet_id     = var.subnet_id
+  associate_public_ip_address = true
   source_ami_filter {
     filters = {
       "tag:Name"          = "csm-app-tier-ami"
