@@ -18,8 +18,9 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
+          aws-region: ap-northeast-2
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
+          
 
       - name: Setup Packer
         uses: hashicorp/setup-packer@main
@@ -38,8 +39,8 @@ jobs:
           packer build -var "aws_region=${{ secrets.AWS_REGION }}" -var "git_hash=$GIT_HASH" -machine-readable app-tier.pkr.hcl | tee packer.log
           echo "ami_id=$(grep -E 'artifact,0,id' packer.log | cut -d, -f6 | cut -d: -f2)" >> $GITHUB_OUTPUT
 
-      - name: Set AMI ID environment variable
-        run: echo "AMI_ID=${{ steps.packer.outputs.ami_id }}" >> $GITHUB_ENV
+      # - name: Set AMI ID environment variable
+      #   run: echo "AMI_ID=${{ steps.packer.outputs.ami_id }}" >> $GITHUB_ENV
 
       # - name: Update Launch Template
       #   run: |
