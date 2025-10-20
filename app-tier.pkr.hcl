@@ -44,13 +44,11 @@ build {
   // Node.js, npm, pm2는 기반 AMI에 이미 설치되어 있다고 가정합니다.
 
   provisioner "file" {
-    description = "Copy application files to temporary location"
     source      = "."
     destination = "/tmp/app-source"
   }
 
   provisioner "shell" {
-    description = "Deploy application and start/reload with pm2"
     inline = [
       // Ensure directory exists and has correct owner
       "sudo mkdir -p /home/ubuntu/app-tier",
