@@ -56,6 +56,13 @@ build {
 
   // Node.js, npm, pm2는 기반 AMI에 이미 설치되어 있다고 가정합니다.
 
+  provisioner "shell" {
+    inline = [
+      "sudo mkdir -p /tmp/app-source",
+      "sudo chown ubuntu:ubuntu /tmp/app-source"
+    ]
+  }
+
   provisioner "file" {
     source      = "./"
     destination = "/tmp/app-source"
