@@ -1,0 +1,60 @@
+name: Deploy App Tier
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Packer
+        uses: hashicorp/setup-packer@main
+        with:
+          version: 'latest'
+
+      - name: Build AMI with Packer
+        id: packer
+        working-directory: ./app-tier
+        run: |
+          # Get the 7-character short Git commit hash
+          GIT_HASH=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "Using Git hash: $GIT_HASH"
+
+          packer init app-tier.pkr.hcl
+          packer build -var "aws_region=${{ secrets.AWS_REGION }}" -var "git_hash=$GIT_HASH" -machine-readable app-tier.pkr.hcl | tee packer.log
+          echo "ami_id=$(grep -E 'artifact,0,id' packer.log | cut -d, -f6 | cut -d: -f2)" >> $GITHUB_OUTPUT
+
+      - name: Set AMI ID environment variable
+        run: echo "AMI_ID=${{ steps.packer.outputs.ami_id }}" >> $GITHUB_ENV
+
+      # - name: Update Launch Template
+      #   run: |
+      #     # TODO: Replace with your launch template ID.
+      #     LAUNCH_TEMPLATE_ID="lt-0123456789abcdef0"
+      #     aws ec2 create-launch-template-version \
+      #       --launch-template-id $LAUNCH_TEMPLATE_ID \
+      #       --version-description "New version with AMI ${{ env.AMI_ID }}" \
+      #       --source-version \$Latest \
+      #       --launch-template-data "{ \"ImageId\": \"${{ env.AMI_ID }}\" }"
+
+      # - name: Start Instance Refresh
+      #   run: |
+      #     # TODO: Replace with your Auto Scaling group name.
+      #     AUTO_SCALING_GROUP_NAME="my-asg"
+      #     aws autoscaling start-instance-refresh \
+      #       --auto-scaling-group-name $AUTO_SCALING_GROUP_NAME \
+      #       --strategy "Rolling"
