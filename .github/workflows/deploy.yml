@@ -3,7 +3,7 @@ name: Deploy App Tier
 on:
   push:
     branches:
-      - main
+      - deploy/simple
 
 jobs:
   build-and-deploy:
@@ -39,23 +39,19 @@ jobs:
           packer build -var "aws_region=${{ secrets.AWS_REGION }}" -var "git_hash=$GIT_HASH" -var "vpc_id=${{ secrets.AWS_VPC_ID }}" -var "subnet_id=${{ secrets.AWS_SUBNET_ID }}" -machine-readable app-tier.pkr.hcl | tee packer.log
           echo "ami_id=$(grep -E 'artifact,0,id' packer.log | cut -d, -f6 | cut -d: -f2)" >> $GITHUB_OUTPUT
 
-      # - name: Set AMI ID environment variable
-      #   run: echo "AMI_ID=${{ steps.packer.outputs.ami_id }}" >> $GITHUB_ENV
+      - name: Set AMI ID environment variable
+        run: echo "AMI_ID=${{ steps.packer.outputs.ami_id }}" >> $GITHUB_ENV
 
-      # - name: Update Launch Template
-      #   run: |
-      #     # TODO: Replace with your launch template ID.
-      #     LAUNCH_TEMPLATE_ID="lt-0123456789abcdef0"
-      #     aws ec2 create-launch-template-version \
-      #       --launch-template-id $LAUNCH_TEMPLATE_ID \
-      #       --version-description "New version with AMI ${{ env.AMI_ID }}" \
-      #       --source-version \$Latest \
-      #       --launch-template-data "{ \"ImageId\": \"${{ env.AMI_ID }}\" }"
+      - name: Update Launch Template
+        run: |
+          aws ec2 create-launch-template-version \
+            --launch-template-id ${{ secrets.LAUNCH_TEMPLATE_ID }} \
+            --version-description "New version with AMI ${{ env.AMI_ID }}" \
+            --source-version \$Latest \
+            --launch-template-data "{ \"ImageId\": \"${{ env.AMI_ID }}\" }"
 
-      # - name: Start Instance Refresh
-      #   run: |
-      #     # TODO: Replace with your Auto Scaling group name.
-      #     AUTO_SCALING_GROUP_NAME="my-asg"
-      #     aws autoscaling start-instance-refresh \
-      #       --auto-scaling-group-name $AUTO_SCALING_GROUP_NAME \
-      #       --strategy "Rolling"
+      - name: Start Instance Refresh
+        run: |
+          aws autoscaling start-instance-refresh \
+            --auto-scaling-group-name ${{ secrets.AUTO_SCALING_GROUP_NAME }} \
+            --strategy "Rolling"

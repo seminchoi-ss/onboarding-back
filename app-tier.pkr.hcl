@@ -92,6 +92,7 @@ build {
       "  pm2 reload app-tier || pm2 start index.js --name app-tier",
       "  # Save the process list to resurrect on reboot",
       "  pm2 save",
+      "  pm2 flush",
       "'",
 
       "# Configure pm2 to run on system startup",
