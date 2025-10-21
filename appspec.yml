@@ -15,7 +15,7 @@ hooks:
       runas: ubuntu
   AfterInstall:
     - location: scripts/install_dependencies.sh # 의존성 설치 (npm install)
-      timeout: 300 # npm install을 위해 충분한 시간 부여
+      timeout: 60
       runas: ubuntu
   ApplicationStart:
     - location: scripts/start_application.sh # PM2로 애플리케이션 시작

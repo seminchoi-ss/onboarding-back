@@ -4,27 +4,23 @@ phases:
   install:
     runtime-versions:
       nodejs: 16
-    commands:
-      - echo "Installing dependencies..."
-      - npm install --production
 
   pre_build:
     commands:
-      - echo "Running tests..."
+      - echo "check prebuild"
       # - npm test
 
   build:
     commands:
       - echo "Build phase complete. No specific build command for this Node.js app."
+      - echo "Installing dependencies..."
+      - npm install --production
 
   post_build:
     commands:
-      - echo "Creating zip archive..."
-      - zip -r app-tier-build.zip . # 현재 디렉토리의 모든 파일을 app-tier-build.zip으로 압축
-      - echo "Uploading zip archive to S3..."
-      - echo "Build artifact (app-tier-build.zip) uploaded to s3://csm-cicd-20251021/app-tier/$CODEBUILD_BUILD_NUMBER/app-tier-build.zip"
+      - echo "Running test"
 
 artifacts:
   files:
-    - 'app-tier-build.zip' # 압축 파일만 아티팩트로 지정
-  base-directory: . # 아티팩트의 기본 디렉토리
+    - '**/*' 
+  base-directory: . 
