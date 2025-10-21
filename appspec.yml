@@ -1,0 +1,27 @@
+version: 0.0
+os: linux
+files:
+  - source: / # S3 아티팩트(압축 해제된)의 루트
+    destination: /home/ubuntu/app-tier # 인스턴스에 복사될 경로
+permissions:
+  - object: /home/ubuntu/app-tier
+    pattern: "**"
+    owner: ubuntu
+    group: ubuntu
+hooks:
+  BeforeInstall:
+    - location: scripts/stop_application.sh # 기존 PM2 프로세스 중지
+      timeout: 60
+      runas: ubuntu
+  AfterInstall:
+    - location: scripts/install_dependencies.sh # 의존성 설치 (npm install)
+      timeout: 300 # npm install을 위해 충분한 시간 부여
+      runas: ubuntu
+  ApplicationStart:
+    - location: scripts/start_application.sh # PM2로 애플리케이션 시작
+      timeout: 60
+      runas: ubuntu
+  ValidateService:
+    - location: scripts/validate_service.sh # 서비스 헬스 체크
+      timeout: 60
+      runas: ubuntu
