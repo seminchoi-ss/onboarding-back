@@ -351,6 +351,11 @@ app.get('/transaction/id',(req,res)=>{
     }
 });
 
+async function startServer() {
+  await transactionService.initializeDbPool; // Await the promise
   app.listen(port, () => {
     console.log(`AB3 backend app listening at http://localhost:${port}`)
-  })
+  });
+}
+
+startServer();
