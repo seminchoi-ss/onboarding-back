@@ -12,6 +12,9 @@ const initializeDbPool = (async () => {
         dbcreds = await getDbSecrets();
         console.log("Database credentials loaded.");
         
+        // Hardcode dbname to 'webappdb'
+        dbcreds.dbname = 'webappdb';
+
         // Factory for creating MySQL connections
         const factory = {
             create: async function() {
